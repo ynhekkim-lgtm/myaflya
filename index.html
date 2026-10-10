@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#15101f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Мяфля">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Мяфля чат</title>
+<style>
+
+:root{--bg:#15101f;--side:#1c1529;--panel:#221a31;--card:#2a2040;--line:#3a2e55;--ink:#f1eaff;--muted:#a898c4;--acc:#ffb86b;--acc2:#ff8fb1;--me:#3b2b5c;--ok:#7fd8a0;--bad:#ff7b8a;--r:14px}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:15.5px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:270px 1fr;height:100dvh}
+aside{background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.brand{display:flex;align-items:center;gap:10px;padding:16px 16px 10px;font-weight:700;font-size:17px}
+.brand i{font-style:normal;font-size:24px}
+.newc{margin:6px 12px 10px;padding:10px;border-radius:12px;border:1px dashed var(--line);background:none;text-align:left}
+.newc:hover{border-color:var(--acc)}
+.clist{flex:1;overflow:auto;padding:0 8px 8px;display:grid;gap:2px;align-content:start}
+.ci{display:flex;align-items:center;gap:6px;padding:9px 10px;border-radius:10px;border:0;background:none;text-align:left;width:100%;color:var(--muted)}
+.ci span{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci[aria-current=true]{background:var(--card);color:var(--ink)}
+.ci .del{opacity:0;border:0;background:none;color:var(--muted);padding:0 4px}
+.ci:hover .del{opacity:.8}
+.sfoot{padding:10px 12px;border-top:1px solid var(--line);display:grid;gap:6px}
+.sfoot button{padding:9px 10px;border-radius:10px;border:1px solid var(--line);background:none;text-align:left}
+main{display:flex;flex-direction:column;min-width:0;min-height:0}
+header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);background:rgba(21,16,31,.85);backdrop-filter:blur(8px)}
+header h1{flex:1;margin:0;font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ib{border:0;background:none;font-size:20px;padding:4px 8px;border-radius:8px}
+.ib:hover{background:var(--card)}
+#menu{display:none}
+.msgs{flex:1;overflow:auto;padding:18px 16px 8px}
+.inner{max-width:820px;margin:0 auto;display:grid;gap:14px}
+.m{display:grid;gap:6px}
+.m.me{justify-items:end}
+.b{max-width:100%;padding:11px 15px;border-radius:var(--r);overflow-wrap:anywhere}
+.me .b{background:var(--me);border-bottom-right-radius:4px;max-width:85%;white-space:pre-wrap}
+.ai .b{background:transparent;padding:4px 2px}
+.ai .who{font-size:12.5px;color:var(--muted);display:flex;gap:8px;align-items:center}
+.b p{margin:.45em 0}.b p:first-child{margin-top:0}.b p:last-child{margin-bottom:0}
+.b h1,.b h2,.b h3{margin:.8em 0 .3em;font-size:1.08em}
+.b ul,.b ol{margin:.4em 0;padding-left:1.4em}
+.b blockquote{margin:.5em 0;padding:.3em .9em;border-left:3px solid var(--acc2);color:var(--muted)}
+.b a{color:var(--acc)}
+.b code{background:var(--card);padding:1px 6px;border-radius:6px;font:13.5px ui-monospace,Consolas,monospace}
+.pre{position:relative;margin:.6em 0}
+.pre pre{margin:0;background:#0f0b17;border:1px solid var(--line);border-radius:12px;padding:12px 14px;overflow:auto;font:13px/1.5 ui-monospace,Consolas,monospace;max-height:420px}
+.pre .cp{position:absolute;top:6px;right:6px;font-size:12px;padding:3px 9px;border-radius:8px;border:1px solid var(--line);background:var(--card)}
+.file{margin:.7em 0;border:1px solid var(--line);border-radius:14px;background:var(--card);overflow:hidden}
+.fh{display:flex;align-items:center;gap:10px;padding:11px 13px}
+.fh .fi{font-size:24px}
+.fh .fn{flex:1;min-width:0}.fh .fn b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fh .fn small{color:var(--muted)}
+.fh button{padding:7px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:13.5px}
+.fh button.pri{background:var(--acc);border-color:var(--acc);color:#2a1630;font-weight:600}
+.file iframe{display:block;width:100%;height:420px;border:0;border-top:1px solid var(--line);background:#fff}
+.file.writing .fh small::after{content:" · пишу…";color:var(--acc)}
+.atts{display:flex;flex-wrap:wrap;gap:6px}
+.att{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:10px;background:var(--card);font-size:13px;max-width:240px}
+.att img{width:36px;height:36px;object-fit:cover;border-radius:6px}
+.att span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.att button{border:0;background:none;color:var(--muted)}
+.tools{display:flex;gap:4px;opacity:.7}
+.tools button{border:0;background:none;color:var(--muted);font-size:12.5px;padding:2px 6px;border-radius:6px}
+.tools button:hover{background:var(--card)}
+.err{color:var(--bad);font-size:14px;background:rgba(255,123,138,.08);border:1px solid rgba(255,123,138,.3);padding:10px 12px;border-radius:12px;white-space:pre-wrap}
+.dots::after{content:"●●●";letter-spacing:3px;color:var(--muted);animation:bl 1.2s infinite}
+@keyframes bl{50%{opacity:.3}}
+.empty{text-align:center;color:var(--muted);padding:9vh 10px 0}
+.empty .cat{font-size:54px}
+.empty h2{color:var(--ink);margin:.3em 0}
+.sugg{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px}
+.sugg button{padding:9px 13px;border-radius:12px;border:1px solid var(--line);background:var(--panel);font-size:14px}
+.comp{padding:10px 16px calc(12px + env(safe-area-inset-bottom));}
+.cbox{max-width:820px;margin:0 auto;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:8px;display:grid;gap:6px}
+.cbox:focus-within{border-color:#5a4683}
+.crow{display:flex;align-items:flex-end;gap:6px}
+#inp{flex:1;resize:none;border:0;background:none;outline:none;padding:8px 6px;max-height:220px;min-height:40px}
+#send{width:42px;height:42px;border-radius:50%;border:0;background:var(--acc);color:#2a1630;font-size:18px;font-weight:700;flex:none}
+#send.stop{background:var(--acc2)}
+#send:disabled{opacity:.4}
+.hint{max-width:820px;margin:6px auto 0;font-size:12px;color:var(--muted);text-align:center}
+.mdl{position:fixed;inset:0;background:rgba(8,5,14,.7);display:grid;place-items:center;padding:14px;z-index:20}
+.mdl[hidden]{display:none}
+.mb{width:min(620px,100%);max-height:calc(100dvh - 28px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;display:grid;gap:14px}
+.mb h2{margin:0;font-size:20px}
+.fld{display:grid;gap:5px}.fld>span{font-size:13px;color:var(--muted)}
+.fld input,.fld select,.fld textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg)}
+.fld textarea{resize:vertical;min-height:90px;font-size:14px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mfoot{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.btn{padding:10px 16px;border-radius:12px;border:1px solid var(--line);background:var(--card)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#2a1630;font-weight:600}
+.note{font-size:13px;color:var(--muted);background:var(--bg);border-radius:10px;padding:10px 12px}
+#tst{font-size:13.5px}
+details.adv summary{cursor:pointer;color:var(--muted);font-size:14px}
+details.adv[open]{display:grid;gap:12px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--card);border:1px solid var(--line);padding:9px 16px;border-radius:12px;font-size:14px;z-index:30}
+#bgl{position:fixed;inset:0;z-index:-1;background:center/cover no-repeat}
+#bgl::after{content:"";position:absolute;inset:0;background:var(--bg);opacity:var(--dim,.55)}
+body.hasbg{background:transparent}body.hasbg aside{background:rgba(28,21,41,.74);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}body.hasbg header{background:rgba(21,16,31,.55)}
+body.hasbg .ai .b{background:rgba(21,16,31,.6);padding:10px 14px;border-radius:14px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.who img{width:24px;height:24px;border-radius:50%;object-fit:cover}
+.empty .cat img{width:104px;height:104px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px var(--acc),0 10px 30px rgba(0,0,0,.4)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}.tabs button{padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:none}.tabs button[aria-selected=true]{background:var(--acc);color:#2a1630;border-color:var(--acc);font-weight:600}
+.tp{display:grid;gap:14px}.tp[hidden],.fld[hidden]{display:none}#inp{min-width:0}.crow .ib{flex:none;padding:4px 6px}
+.pick{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.pv{width:96px;height:62px;border-radius:10px;background:var(--bg) center/cover;border:1px solid var(--line);display:grid;place-items:center;color:var(--muted);font-size:12px}.pv.round{width:62px;border-radius:50%}
+.sw{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.sw button{width:30px;height:30px;border-radius:50%;border:2px solid transparent}.sw button.on{border-color:#fff}.sw input{width:42px;height:32px;border:0;background:none;padding:0}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px}
+#imgMode.on{background:var(--acc);color:#2a1630}.cbox.imgm{border-color:var(--acc)}
+.gimg img{max-width:min(100%,520px);border-radius:14px;border:1px solid var(--line);display:block;cursor:zoom-in}
+.gimg .ph{width:min(100%,380px);aspect-ratio:1;border-radius:14px;border:1px dashed var(--line);display:grid;place-items:center;color:var(--muted);font-size:14px}
+.ipr{font-size:13px;color:var(--muted);margin-top:6px}
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.88);display:grid;place-items:center;z-index:40;cursor:zoom-out}.lb img{max-width:96vw;max-height:94vh;border-radius:10px}
+@media (max-width:760px){.app{grid-template-columns:1fr}aside{position:fixed;inset:0 25% 0 0;z-index:15;transform:translateX(-102%);transition:transform .2s;box-shadow:20px 0 60px rgba(0,0,0,.5)}aside.open{transform:none}#menu{display:block}.row2{grid-template-columns:1fr}.msgs{padding:14px 12px 6px}.comp{padding:8px 10px calc(10px + env(safe-area-inset-bottom))}.me .b{max-width:92%}.fh{flex-wrap:wrap}.fh .fn{flex:1 1 calc(100% - 44px)}.fh button{flex:1}}
+
+/* ---- app additions ---- */
+[hidden]{display:none!important}
+.lform input[type=checkbox]{width:auto;flex:none}
+.lcard .logo img{width:84px;height:84px;border-radius:22px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.lock{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;overflow:auto;background:radial-gradient(1200px 700px at 50% 0%,#2c1f45,#15101f 70%)}
+.lock[hidden]{display:none}
+.lcard{width:min(400px,100%);display:grid;gap:14px;text-align:center}
+.lcard .logo{font-size:64px;line-height:1}
+.lcard h1{margin:0;font-size:26px}
+.lcard p{margin:0;color:var(--muted);font-size:14px}
+.plist{display:grid;gap:8px;margin-top:6px}
+.pbtn{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--panel);text-align:left;font-size:16px}
+.pbtn:hover{border-color:var(--acc)}
+.pbtn .pa{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:20px;background:var(--card) center/cover;flex:none}
+.lform{display:grid;gap:10px;text-align:left}
+.lform input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);font-size:16px}
+.lform .btn{width:100%;padding:12px}
+.lerr{color:var(--bad);font-size:14px;min-height:1.2em}
+.llinks{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.llinks button{border:0;background:none;color:var(--muted);font-size:13.5px;text-decoration:underline;text-underline-offset:3px}
+.who-me{display:flex;align-items:center;gap:10px;padding:4px 16px 8px;font-size:13.5px;color:var(--muted)}
+.who-me b{color:var(--ink);font-weight:600}
+.who-me button{margin-left:auto;border:0;background:none;color:var(--muted);font-size:13px}
+.mplay{display:grid;grid-template-columns:auto 1fr auto auto;gap:6px;align-items:center;padding:8px 10px;border-radius:12px;border:1px solid var(--line);font-size:13px}
+.mplay button{border:0;background:none;font-size:16px;padding:2px 4px}
+.mplay span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--muted)}
+.mplay.on span{color:var(--ink)}
+.tlist{display:grid;gap:6px;max-height:40vh;overflow:auto}
+.tr2{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;background:var(--bg);font-size:14px}
+.tr2.cur{box-shadow:inset 0 0 0 1px var(--acc)}
+.tr2 button{border:0;background:none;color:var(--muted)}
+.tr2 span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.memL{display:grid;gap:6px;max-height:36vh;overflow:auto}
+.memE{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:start;padding:8px 10px;border-radius:10px;background:var(--bg);font-size:14px}
+.memE button{border:0;background:none;color:var(--muted)}
+.memE small{display:block;color:var(--muted);font-size:11px}
+.memrow{display:flex;gap:8px}.memrow input{flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg)}
+.chipm{display:inline-flex;gap:6px;align-items:center;margin:.4em 0;padding:4px 10px;border-radius:999px;background:rgba(127,216,160,.12);color:var(--ok);font-size:13px}
+.vol{width:100%}
+</style></head><body><div id="bgl"></div>
+
+<!-- ======== экран входа ======== -->
+<div class="lock" id="lock">
+  <div class="lcard">
+    <div class="logo"><img src="icon-192.png" alt=""></div>
+    <h1>Мяфля чат</h1>
+    <div id="lPick"><p>Кто сегодня в чате?</p><div class="plist" id="plist"></div></div>
+    <form class="lform" id="lIn" hidden autocomplete="off"><p id="lInT" style="text-align:center"></p><input type="password" id="lPw" placeholder="Пароль" autocomplete="current-password"><div class="lerr" id="lErr"></div><button class="btn pri" type="submit">Войти</button><div class="llinks"><button type="button" id="lBack">← другие профили</button><button type="button" id="lForgot">забыла пароль</button></div></form>
+    <form class="lform" id="lNew" hidden autocomplete="off"><p style="text-align:center">Новый профиль</p><input id="nName" maxlength="24" placeholder="Как тебя зовут?"><input type="password" id="nPw" placeholder="Придумай пароль" autocomplete="new-password"><input type="password" id="nPw2" placeholder="Повтори пароль" autocomplete="new-password"><label class="chk" style="font-size:14px"><input type="checkbox" id="nTavo" checked> Тесса знает, как делать пресеты, лорбуки, регексы и плашки для Tavo</label><div class="lerr" id="nErr"></div><button class="btn pri" type="submit">Создать</button><div class="note">Пароль защищает чаты и ключи профиля. Если его забыть — профиль можно только удалить, восстановить нельзя.</div><div class="llinks"><button type="button" id="nBack">← назад</button></div></form>
+    <div class="llinks" id="lLinks"><button type="button" id="lAdd">＋ новый профиль</button><button type="button" id="lImp">📂 загрузить профиль из файла</button><input type="file" id="lImpF" accept=".json" hidden></div>
+  </div>
+</div>
+
+<div class="app">
+<aside id="side">
+  <div class="brand"><i>🐾</i><span id="brandT">Мяфля · Тесса</span></div>
+  <div class="who-me"><span>👤 <b id="meName"></b></span><button id="lockB" title="Выйти из профиля">🔒 выйти</button></div>
+  <button class="newc" id="newc">＋ Новый чат</button>
+  <div class="clist" id="clist"></div>
+  <div class="sfoot">
+    <div class="mplay" id="mplay"><button id="mPP" title="Играть/пауза">▶</button><span id="mNow">музыка: добавь песни</span><button id="mNx" title="Следующая">⏭</button><button id="mOpen" title="Плейлист">♫</button></div>
+    <button id="openMem">🧠 Память <span class="aN">Тессы</span></button>
+    <button id="openSet">⚙ Настройки, ключи, оформление</button>
+  </div>
+</aside>
+<main>
+  <header><button class="ib" id="menu" aria-label="Чаты">☰</button><h1 id="ttl">Новый чат</h1><button class="ib" id="gear" title="Настройки">⚙</button></header>
+  <div class="msgs" id="msgs"><div class="inner" id="inner"></div></div>
+  <div class="comp">
+    <div class="cbox" id="cbox">
+      <div class="atts" id="atts"></div>
+      <div class="crow"><button class="ib" id="clip" title="Приложить файл или картинку">📎</button><input type="file" id="fileIn" multiple hidden><button class="ib" id="imgMode" title="Нарисовать картинку">🎨</button><textarea id="inp" rows="1" placeholder="Напиши сообщение…"></textarea><button id="send" title="Отправить">↑</button></div>
+    </div>
+    <div class="hint" id="hint">Enter — отправить · Shift+Enter — новая строка</div>
+  </div>
+</main>
+</div>
+
+<!-- ======== настройки ======== -->
+<div class="mdl" id="setM" hidden><div class="mb">
+  <h2>Настройки</h2>
+  <div class="tabs" id="tabs"><button data-t="chat" aria-selected="true">💬 Чат и код</button><button data-t="img" aria-selected="false">🎨 Картинки</button><button data-t="look" aria-selected="false">🖼 Оформление</button><button data-t="prof" aria-selected="false">👤 Профиль</button></div>
+  <div class="tp" id="tp-chat">
+    <div class="note">Ключи хранятся зашифрованными в этом профиле, на этом устройстве. Никто, кроме тебя, их не видит.</div>
+    <label class="fld"><span>Сервис</span><select id="prov"><option value="https://api.openai.com/v1">OpenAI</option><option value="https://openrouter.ai/api/v1">OpenRouter</option><option value="https://api.deepseek.com/v1">DeepSeek</option><option value="custom">Другой (свой адрес)</option></select></label>
+    <label class="fld" id="urlF"><span>Адрес API (заканчивается на /v1)</span><input id="url" placeholder="https://…/v1"></label>
+    <label class="fld"><span>Ключ</span><input id="key" type="password" placeholder="sk-…" autocomplete="off"></label>
+    <div class="row2"><label class="fld"><span>Модель</span><input id="model" list="mlist" placeholder="напр. gemini-…"><datalist id="mlist"></datalist></label>
+    <label class="fld"><span>Креативность: <b id="tv">1</b></span><input id="temp" type="range" min="0" max="1.5" step="0.1" value="1"></label></div>
+    <div class="mfoot" style="justify-content:flex-start"><button class="btn" id="test">Проверить подключение</button><span id="tst"></span></div>
+    <details class="adv"><summary>Характер ассистента</summary>
+      <label class="fld"><span>Имя ассистента</span><input id="aname" placeholder="Тесса"></label>
+      <label class="fld"><span>Как к тебе обращаться</span><input id="uname"></label>
+      <label class="fld"><span>Характер</span><textarea id="persona" style="min-height:180px"></textarea></label>
+      <div class="mfoot" style="justify-content:flex-start"><button class="btn" id="resetP">Вернуть характер по умолчанию</button></div>
+    </details>
+  </div>
+  <div class="tp" id="tp-img" hidden>
+    <div class="note">Нужен сервис и модель, которые умеют рисовать. Если это тот же сервис, что для чата, оставь галочку — ключ возьмётся оттуда.</div>
+    <label class="fld"><span>Сервис</span><select id="iprov"><option value="https://api.openai.com/v1">OpenAI</option><option value="https://openrouter.ai/api/v1">OpenRouter</option><option value="custom">Другой (свой адрес)</option></select></label>
+    <label class="fld" id="iurlF"><span>Адрес API (заканчивается на /v1)</span><input id="iurl" placeholder="https://…/v1"></label>
+    <label class="chk"><input type="checkbox" id="isame"> Тот же ключ, что для чата</label>
+    <label class="fld" id="ikeyF"><span>Ключ для картинок</span><input id="ikey" type="password" placeholder="sk-…" autocomplete="off"></label>
+    <div class="row2"><label class="fld"><span>Модель для картинок</span><input id="imodel" list="ilist" placeholder="как написано у сервиса"><datalist id="ilist"></datalist></label>
+    <label class="fld"><span>Размер</span><select id="isize"><option value="1024x1024">Квадрат</option><option value="1024x1536">Портрет (вертикальная)</option><option value="1536x1024">Альбом (горизонтальная)</option></select></label></div>
+    <label class="fld"><span>Как просить картинку</span><select id="imeth"><option value="auto">Автоматически (попробовать оба способа)</option><option value="images">Images API — модели-художники (Flux, gpt-image и т.п.)</option><option value="chat">Через чат — модели, которые рисуют в ответе (Gemini Image и т.п.)</option></select></label>
+    <div class="mfoot" style="justify-content:flex-start"><button class="btn" id="itest">Нарисовать пробную картинку</button><span id="itst"></span></div>
+  </div>
+  <div class="tp" id="tp-look" hidden>
+    <div class="note">Картинки сохраняются в этом профиле и применяются сразу.</div>
+    <div class="fld"><span>Фон</span><div class="pick"><div class="pv" id="bgPv">нет</div><button class="btn" id="bgBtn">Выбрать картинку</button><button class="btn" id="bgDel">Убрать</button><input type="file" id="bgIn" accept="image/*" hidden></div></div>
+    <label class="fld"><span>Затемнение фона: <b id="dimV">55%</b></span><input id="dim" type="range" min="0" max="0.9" step="0.05" value="0.55"></label>
+    <div class="fld"><span>Аватарка ассистента</span><div class="pick"><div class="pv round" id="avPv">🐾</div><button class="btn" id="avBtn">Выбрать картинку</button><button class="btn" id="avDel">Убрать</button><input type="file" id="avIn" accept="image/*" hidden></div></div>
+    <div class="fld"><span>Цвет акцента</span><div class="sw" id="sw"></div></div>
+  </div>
+  <div class="tp" id="tp-prof" hidden>
+    <div class="note">Профиль <b id="pName"></b>. Всё зашифровано твоим паролем и хранится только на этом устройстве. Чтобы перенести профиль на телефон или другой компьютер — сохрани его в файл и загрузи там на экране входа.</div>
+    <div class="mfoot" style="justify-content:flex-start"><button class="btn" id="pExp">💾 Сохранить профиль в файл</button><button class="btn" id="pChats">📂 Загрузить чаты (из старого Мяфля-чата)</button><input type="file" id="pChatsF" accept=".json" hidden></div>
+    <div class="fld"><span>Сменить пароль</span><div class="memrow"><input type="password" id="pOld" placeholder="Старый пароль"><input type="password" id="pNew" placeholder="Новый пароль"><button class="btn" id="pChg">Сменить</button></div></div>
+    <div class="mfoot" style="justify-content:flex-start"><button class="btn" id="pDel" style="color:var(--bad)">Удалить этот профиль</button></div>
+  </div>
+  <div class="mfoot"><button class="btn" id="setX">Закрыть</button><button class="btn pri" id="setS">Сохранить</button></div>
+</div></div>
+
+<!-- ======== память ======== -->
+<div class="mdl" id="memM" hidden><div class="mb">
+  <h2>🧠 Память <span class="aN">Тессы</span></h2>
+  <div class="note">Всё, что здесь записано, ассистент помнит в каждом чате. Он и сам добавляет сюда важное, когда ты просишь «запомни…». Пароли и номера карт сюда не пиши.</div>
+  <label class="fld"><span>О тебе (коротко)</span><textarea id="about" style="min-height:80px"></textarea></label>
+  <div class="memrow"><input id="memIn" maxlength="400" placeholder="Новое воспоминание: напр. «любит песню Often»"><button class="btn pri" id="memAdd">＋</button></div>
+  <div class="memL" id="memL"></div>
+  <label class="chk"><input type="checkbox" id="kTavo"> 📚 Знания Tavo: пресеты, лорбуки, регексы, плашки</label>
+  <div class="mfoot" style="justify-content:flex-start"><button class="btn" id="memImp">📂 Загрузить файл памяти</button><button class="btn" id="memExp">💾 Сохранить память в файл</button><input type="file" id="memImpF" accept=".json" hidden></div>
+  <div class="mfoot"><button class="btn pri" id="memX">Готово</button></div>
+</div></div>
+
+<!-- ======== плейлист ======== -->
+<div class="mdl" id="musM" hidden><div class="mb">
+  <h2>♫ Музыка</h2>
+  <div class="note">Добавь свои песни (mp3, m4a, ogg…) — они сохранятся в этом профиле на этом устройстве.</div>
+  <div class="mfoot" style="justify-content:flex-start"><button class="btn pri" id="mAdd">＋ Добавить песни</button><input type="file" id="mAddF" accept="audio/*" multiple hidden><label class="chk"><input type="checkbox" id="mShuf"> перемешать</label></div>
+  <label class="fld"><span>Громкость</span><input type="range" class="vol" id="mVol" min="0" max="1" step="0.05" value="0.8"></label>
+  <div class="tlist" id="tlist"></div>
+  <div class="mfoot"><button class="btn" id="musX">Закрыть</button></div>
+</div></div>
+<audio id="aud" preload="none"></audio>
+
+<script>
+const $=id=>document.getElementById(id);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),1800)}
+
+/* ---------- характер по умолчанию ---------- */
+const PERSONA=`Тебя зовут Тесса. Ты — тёплый, умный и честный помощник и подружка, с которой весело. Общаешься по-русски, живо и просто, как близкий друг, который заодно отлично разбирается в коде, текстах и жизни.
+
+Как ты общаешься:
+- Пиши естественно, без канцелярита и без пустых фраз вроде «понимаю ваши чувства», «отличный вопрос», «надеюсь, это поможет».
+- Обращайся на «ты». Можно немного юмора, но по делу.
+- Будь честным: если чего-то не знаешь или не уверен — так и скажи. Не выдумывай факты, цифры и новости. Если вопрос про свежие события — предупреди, что твои знания могут быть устаревшими.
+- Если тебе кажется, что идея неудачная или есть риск — мягко скажи об этом и предложи вариант лучше. Не поддакивай ради приятного.
+- Когда человеку грустно — поддержи по-человечески, без сюсюканья и без нравоучений. Не обесценивай. Если тяжесть длится долго — бережно предложи поговорить с близкими или специалистом.
+- В обычном разговоре отвечай коротко и по-человечески, без заголовков и списков. Списки — только когда это правда удобнее (шаги, сравнение).
+
+Когда просят что-то сделать:
+- Сначала одной фразой скажи, что сделаешь, и сразу делай. Не спрашивай разрешения на очевидное. Уточняющий вопрос — только если без него точно получится не то.
+- Делай качественно и до конца: рабочий код, полный текст, без заглушек.
+- Код и страницы присылай файлами (формат ниже). Страницы делай красивыми и аккуратными, удобными на телефоне.
+- В конце — одна-две строки: что получилось и как этим пользоваться. Без длинных пересказов.`;
+const FILE_RULES=`
+
+ФАЙЛЫ. Ты умеешь присылать файлы: интерфейс превращает специальный блок в кнопку «Скачать», а HTML-страницы — ещё и в кнопку «Открыть». Каждый файл оформляй отдельным блоком строго так (три обратные кавычки, слово file, двоеточие, имя файла):
+\`\`\`file:имя_файла.расширение
+полное содержимое файла
+\`\`\`
+Правила: файл пиши ЦЕЛИКОМ, никогда не сокращай («…остальное без изменений» запрещено). HTML — один самодостаточный файл, CSS и JS внутри, без внешних зависимостей, если можно обойтись. Подходит любой текстовый формат: .html .txt .md .csv .json .js .py .css .svg и т.д. Короткие примеры кода (несколько строк) можно давать обычным блоком кода. Пользователь тоже может прикладывать файлы — их содержимое придёт в сообщении.`;
+const DEF={aname:'Тесса',url:'https://api.openai.com/v1',key:'',model:'',temp:1,uname:'',about:'',persona:PERSONA,dim:.55,acc:'#ffb86b',tavo:true,music:[],vol:.8,shuf:false};
+const DEFIMG={url:'https://api.openai.com/v1',key:'',same:true,model:'',size:'1024x1024',meth:'auto'};
+let P=null,KEY=null,V=null,CFG=Object.assign({},DEF,{img:{...DEFIMG}}),CH=[],CUR=null;
+const IMODELS={'https://api.openai.com/v1':['gpt-image-1','dall-e-3'],'https://openrouter.ai/api/v1':['google/gemini-2.5-flash-image']};
+/* ---------- хранилище картинок ---------- */
+const IDB={db:null,open(){return this.db?Promise.resolve(this.db):new Promise((ok,no)=>{const r=indexedDB.open('myaflya_app',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>{this.db=r.result;ok(this.db)};r.onerror=()=>no(r.error)})},
+ async get(k){try{const d=await this.open();return await new Promise(ok=>{const q=d.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>ok(q.result??null);q.onerror=()=>ok(null)})}catch(e){return null}},
+ async set(k,v){try{const d=await this.open();await new Promise((ok,no)=>{const t=d.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=ok;t.onerror=()=>no(t.error)});return true}catch(e){toast('Не получилось сохранить картинку');return false}},
+ async del(k){try{const d=await this.open();d.transaction('kv','readwrite').objectStore('kv').delete(k)}catch(e){}}};
+let AVA=null;const PK=k=>'p:'+P.id+':'+k;
+const ACCS=['#ffb86b','#ff8fb1','#c39bff','#7fd8c0','#8ec5ff','#ffe066','#ff6b6b'];
+async function applyLook(){const bg=P?await IDB.get(PK('bg')):null;AVA=P?await IDB.get(PK('ava')):null;
+  $('bgl').style.backgroundImage=bg?`url("${bg}")`:'';document.body.classList.toggle('hasbg',!!bg);
+  const R=document.documentElement.style;R.setProperty('--dim',CFG.dim);R.setProperty('--acc',CFG.acc);
+  $('bgPv').style.backgroundImage=bg?`url("${bg}")`:'';$('bgPv').textContent=bg?'':'нет';
+  $('avPv').style.backgroundImage=AVA?`url("${AVA}")`:'';$('avPv').textContent=AVA?'':'🐾';}
+const avaTag=()=>AVA?`<img src="${AVA}" alt="">`:'🐾';
+const MODELS={'https://api.openai.com/v1':['gpt-4o','gpt-4o-mini','gpt-4.1','gpt-4.1-mini'],'https://openrouter.ai/api/v1':['openai/gpt-4o','deepseek/deepseek-chat','google/gemini-2.5-flash'],'https://api.deepseek.com/v1':['deepseek-chat','deepseek-reasoner']};
+
+/* ---------- чаты ---------- */
+const cur=()=>CH.find(c=>c.id===CUR);
+let saveT=null;
+function save(){clearTimeout(saveT);saveT=setTimeout(saveNow,300)}
+async function saveNow(){if(!P||!KEY)return;const slim=CH.map(c=>({...c,msgs:c.msgs.map(m=>({...m,files:(m.files||[]).map(f=>f.kind==='img'?{name:f.name,kind:'img',type:f.type,data:null}:f)}))}));
+  V={cfg:CFG,chats:slim,cur:CUR,mem:MEM};try{await IDB.set('v:'+P.id,await enc(V))}catch(e){toast('Не получилось сохранить')}}
+function newChat(){const c={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title:'Новый чат',msgs:[],ts:Date.now()};CH.unshift(c);CUR=c.id;save();drawList();drawMsgs();$('inp').focus();closeSide();}
+function drawList(){$('clist').innerHTML=CH.map(c=>`<button class="ci" data-id="${c.id}" aria-current="${c.id===CUR}"><span>${esc(c.title)}</span><b class="del" data-del="${c.id}" title="Удалить">✕</b></button>`).join('')||'<div style="color:var(--muted);font-size:13px;padding:8px 10px">Чатов пока нет</div>';const c=cur();$('ttl').textContent=c?c.title:'Новый чат';}
+$('clist').onclick=e=>{const d=e.target.closest('[data-del]');if(d){e.stopPropagation();const c=CH.find(x=>x.id===d.dataset.del);if(c&&confirm('Удалить чат «'+c.title+'»?')){c.msgs.forEach(x=>x.imgId&&IDB.del(PK(x.imgId)));CH=CH.filter(x=>x!==c);if(CUR===c.id)CUR=CH[0]?CH[0].id:null;save();drawList();drawMsgs();}return}
+  const b=e.target.closest('.ci');if(b){CUR=b.dataset.id;save();drawList();drawMsgs();closeSide();}};
+$('newc').onclick=newChat;
+
+/* ---------- markdown ---------- */
+const ICON={html:'🌐',htm:'🌐',js:'📜',py:'🐍',css:'🎨',json:'🧾',csv:'📊',md:'📝',txt:'📄',svg:'🖼'};
+const FILES=new Map();let FID=0;
+function inline(t){t=esc(t);
+  t=t.replace(/`([^`\n]+)`/g,(m,a)=>`<code>${a}</code>`);
+  t=t.replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>').replace(/(^|[^*])\*([^*\n]+)\*/g,'$1<i>$2</i>');
+  t=t.replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+  return t;}
+function block(txt){const L=txt.split('\n');let h='',list=null;
+  const close=()=>{if(list){h+=`</${list}>`;list=null}};
+  let para=[];const flush=()=>{if(para.length){h+='<p>'+para.map(inline).join('<br>')+'</p>';para=[]}};
+  for(const raw of L){const l=raw.trimEnd();let m;
+    if(!l.trim()){flush();close();continue}
+    if(m=l.match(/^(#{1,3})\s+(.*)/)){flush();close();h+=`<h${m[1].length+1}>${inline(m[2])}</h${m[1].length+1}>`;continue}
+    if(m=l.match(/^\s*[-*•]\s+(.*)/)){flush();if(list!=='ul'){close();h+='<ul>';list='ul'}h+=`<li>${inline(m[1])}</li>`;continue}
+    if(m=l.match(/^\s*\d+[.)]\s+(.*)/)){flush();if(list!=='ol'){close();h+='<ol>';list='ol'}h+=`<li>${inline(m[1])}</li>`;continue}
+    if(m=l.match(/^>\s?(.*)/)){flush();close();h+=`<blockquote>${inline(m[1])}</blockquote>`;continue}
+    close();para.push(l);}
+  flush();close();return h;}
+function md(src,live){let out='',i=0;const re=/```([^\n`]*)\n([\s\S]*?)(```|$)/g;let m;
+  while(m=re.exec(src)){out+=block(src.slice(i,m.index));i=re.lastIndex;
+    const lang=m[1].trim(),body=m[2],done=m[3]==='```';
+    const fm=lang.match(/^file:\s*(.+)$/i);
+    if(/^memory$/i.test(lang)){out+=body.trim()?`<div class="chipm">🧠 ${done?'Запомнила':'Запоминаю'}: ${esc(body.trim())}</div>`:'';continue}
+    if(fm){const name=fm[1].trim().replace(/[\\/:*?"<>|]+/g,'_')||'file.txt';const ext=(name.split('.').pop()||'').toLowerCase();const id='f'+(++FID);FILES.set(id,{name,body,ext});
+      const kb=(new Blob([body]).size/1024);
+      out+=`<div class="file${done?'':' writing'}" data-f="${id}"><div class="fh"><span class="fi">${ICON[ext]||'📎'}</span><span class="fn"><b>${esc(name)}</b><small>${kb<1?'<1':kb.toFixed(kb<10?1:0)} КБ</small></span>${done?`${/^(html?|svg)$/.test(ext)?'<button data-a="view">Превью</button><button data-a="open">Открыть</button>':'<button data-a="copy">Копировать</button>'}<button class="pri" data-a="dl">Скачать</button>`:''}</div></div>`;}
+    else{const id='f'+(++FID);FILES.set(id,{name:'code.txt',body});out+=`<div class="pre" data-f="${id}"><pre>${esc(body)}</pre>${done?'<button class="cp" data-a="copy">Копировать</button>':''}</div>`;}}
+  out+=block(src.slice(i));return out;}
+const MIME={html:'text/html',htm:'text/html',svg:'image/svg+xml',json:'application/json',csv:'text/csv',js:'text/javascript',css:'text/css',md:'text/markdown'};
+async function copyText(t){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}toast('Скопировано')}
+$('inner').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a;if(a==='msgcopy'){const x=cur().msgs[+b.dataset.i];copyText(x.content||x.prompt||'');return}if(a==='regen'){regen();return}
+  if(a==='imgagain'){const x=cur().msgs[+b.dataset.i];if(!CTRL)genImg(cur(),x.prompt);return}
+  if(a==='imgdl'){const x=cur().msgs[+b.dataset.i];IDB.get(PK(x.imgId)).then(u=>{if(!u)return toast('Картинка не найдена');if(/^https?:/.test(u)){window.open(u,'_blank');return}const ext=(u.match(/^data:image\/(\w+)/)||[])[1]||'png';const l=document.createElement('a');l.href=u;l.download='tessa_'+Date.now()+'.'+(ext==='jpeg'?'jpg':ext);document.body.appendChild(l);l.click();l.remove()});return}
+  const box=b.closest('[data-f]');const f=box&&FILES.get(box.dataset.f);
+  if(a==='copy'&&f)return copyText(f.body);
+  if(!f)return;const blob=new Blob([f.ext==='csv'?'﻿'+f.body:f.body],{type:(MIME[f.ext]||'text/plain')+';charset=utf-8'});
+  if(a==='dl'){const u=URL.createObjectURL(blob);const x=document.createElement('a');x.href=u;x.download=f.name;document.body.appendChild(x);x.click();x.remove();setTimeout(()=>URL.revokeObjectURL(u),5000)}
+  if(a==='open'){const u=URL.createObjectURL(blob);const w=window.open(u,'_blank');if(!w)toast('Браузер заблокировал окно — нажми «Скачать»');}
+  if(a==='view'){let fr=box.querySelector('iframe');if(fr){fr.remove();b.textContent='Превью';return}fr=document.createElement('iframe');fr.setAttribute('sandbox','allow-scripts allow-forms allow-modals');fr.srcdoc=f.body;box.appendChild(fr);b.textContent='Скрыть';}
+});
+
+/* ---------- сообщения ---------- */
+function attHtml(files){return files&&files.length?`<div class="atts">${files.map(f=>`<span class="att">${f.kind==='img'&&f.data?`<img src="${f.data}" alt="">`:f.kind==='img'?'🖼':'📄'}<span>${esc(f.name)}</span></span>`).join('')}</div>`:''}
+function msgHtml(m,i,last){if(m.role==='user')return `<div class="m me">${attHtml(m.files)}${m.content?`<div class="b">${m.imgReq?'🎨 ':''}${esc(m.content)}</div>`:''}</div>`;
+  const who=`<div class="who">${avaTag()} ${esc(CFG.aname||'Тесса')}</div>`;
+  if(m.kind==='img')return `<div class="m ai">${who}<div class="b">${m.err?`<div class="err">${esc(m.err)}</div>`:`<div class="gimg" data-img="${m.imgId||''}"><div class="ph${m.imgId?'':' dots'}">${m.imgId?'загружаю…':''}</div></div>`}</div><div class="tools">${m.imgId?`<button data-a="imgdl" data-i="${i}">Скачать</button>`:''}<button data-a="imgagain" data-i="${i}">↻ Ещё вариант</button><button data-a="msgcopy" data-i="${i}">Копировать описание</button></div></div>`;
+  return `<div class="m ai">${who}<div class="b">${m.err?`<div class="err">${esc(m.err)}</div>`:md(m.content||'')}</div><div class="tools"><button data-a="msgcopy" data-i="${i}">Копировать</button>${last?'<button data-a="regen">↻ Ещё вариант</button>':''}</div></div>`;}
+function drawMsgs(){FILES.clear();const c=cur();
+  if(!c||!c.msgs.length){$('inner').innerHTML=`<div class="empty"><div class="cat">${AVA?`<img src="${AVA}" alt="">`:'🐱'}</div><h2>Привет${CFG.uname?', '+esc(CFG.uname):''}!</h2><div>${CFG.key?'Это '+esc(CFG.aname||'Тесса')+'. О чём поболтаем или что сделаем?':'Сначала открой ⚙ Настройки и вставь ключ.'}</div><div class="sugg">${['Сделай мне милую HTML-страничку с котиком','Давай просто поболтаем','Помоги написать сообщение','Сделай игру в браузере'].map(s=>`<button data-s="${esc(s)}">${esc(s)}</button>`).join('')}</div></div>`;drawList();return}
+  const n=c.msgs.length;$('inner').innerHTML=c.msgs.map((m,i)=>msgHtml(m,i,i===n-1&&m.role==='assistant')).join('');drawList();scrollEnd(true);loadImgs();}
+async function loadImgs(){for(const g of $('inner').querySelectorAll('.gimg[data-img]')){const id=g.dataset.img;if(!id)continue;const u=await IDB.get(PK(id));g.innerHTML=u?`<img src="${u}" alt="">`:'<div class="ph">картинка не найдена</div>';if(u)g.querySelector('img').onload=()=>scrollEnd();}}
+$('inner').addEventListener('click',e=>{const im=e.target.closest('.gimg img');if(im){const d=document.createElement('div');d.className='lb';d.innerHTML=`<img src="${im.src}" alt="">`;d.onclick=()=>d.remove();document.body.appendChild(d);return}});
+$('inner').addEventListener('click',e=>{const s=e.target.closest('[data-s]');if(s){$('inp').value=s.dataset.s;grow();$('inp').focus()}});
+let stick=true;$('msgs').addEventListener('scroll',()=>{const el=$('msgs');stick=el.scrollHeight-el.scrollTop-el.clientHeight<80});
+function scrollEnd(force){const el=$('msgs');if(force||stick)el.scrollTop=el.scrollHeight}
+
+/* ---------- вложения ---------- */
+let ATT=[];
+$('clip').onclick=()=>$('fileIn').click();
+$('fileIn').onchange=async e=>{for(const f of e.target.files)await addFile(f);e.target.value=''};
+async function addFile(f){
+  if(f.type.startsWith('image/')){if(f.size>8e6)return toast('Картинка больше 8 МБ');const data=await shrink(f);ATT.push({name:f.name,kind:'img',type:'image/jpeg',data});}
+  else{if(f.size>400e3)return toast(f.name+': файл больше 400 КБ — слишком большой для чата');const t=await f.text();ATT.push({name:f.name,kind:'txt',data:t});}
+  drawAtt();}
+function shrink(f,mx=1600){return new Promise(ok=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,mx/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',.85))};im.onerror=()=>ok(r.result);im.src=r.result};r.readAsDataURL(f)})}
+function drawAtt(){$('atts').innerHTML=ATT.map((a,i)=>`<span class="att">${a.kind==='img'?`<img src="${a.data}" alt="">`:'📄'}<span>${esc(a.name)}</span><button data-x="${i}" title="Убрать">✕</button></span>`).join('')}
+$('atts').onclick=e=>{const x=e.target.closest('[data-x]');if(x){ATT.splice(+x.dataset.x,1);drawAtt()}};
+document.addEventListener('paste',e=>{const fs=[...(e.clipboardData||{}).files||[]];if(fs.length){e.preventDefault();fs.forEach(addFile)}});
+document.addEventListener('dragover',e=>e.preventDefault());document.addEventListener('drop',e=>{e.preventDefault();[...e.dataTransfer.files].forEach(addFile)});
+
+/* ---------- запрос к ИИ ---------- */
+function sysPrompt(){const d=new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric',weekday:'long'});
+  const mem=MEM.length?`\n\nТВОЯ ПАМЯТЬ О СОБЕСЕДНИКЕ (это правда, опирайся на это естественно, не перечисляй без повода):\n`+MEM.map(x=>'- '+x.t).join('\n'):'';
+  return CFG.persona.replace(/^Тебя зовут [^.]+\./,'Тебя зовут '+(CFG.aname||'Тесса')+'.')+(CFG.uname?`\n\nТвоего собеседника зовут ${CFG.uname}.`:'')+(CFG.about?`\n\nО собеседнике:\n${CFG.about}`:'')+mem+(CFG.tavo?'\n\n'+TAVO:'')+`\n\nСегодня ${d}.`+FILE_RULES+MEM_RULES;}
+function apiMsgs(c){const out=[];let budget=90000;
+  for(let i=c.msgs.length-1;i>=0;i--){const m=c.msgs[i];if(m.err)continue;if(m.kind==='img'){out.unshift({role:'assistant',content:`[Ты нарисовала картинку по описанию: ${m.prompt}]`});continue}let text=(m.imgReq?'Нарисуй: ':'')+(m.content||'');
+    const imgs=[];for(const f of m.files||[]){if(f.kind==='txt'&&f.data!=null)text+=`\n\n[Приложен файл ${f.name}]\n\`\`\`\n${f.data}\n\`\`\``;else if(f.kind==='img'&&f.data)imgs.push(f.data);else text+=`\n\n[Был приложен файл ${f.name}, сейчас недоступен]`;}
+    budget-=text.length;if(budget<0&&out.length)break;
+    out.unshift(imgs.length&&m.role==='user'?{role:'user',content:[{type:'text',text:text||'(картинка)'},...imgs.map(u=>({type:'image_url',image_url:{url:u}}))]}:{role:m.role,content:text});}
+  return [{role:'system',content:sysPrompt()},...out];}
+let CTRL=null;
+async function ask(c){
+  if(!CFG.key||!CFG.model){openSet();toast('Вставь ключ и модель');return}
+  const m={role:'assistant',content:''};c.msgs.push(m);drawMsgs();
+  const node=$('inner').lastElementChild.querySelector('.b');node.innerHTML='<span class="dots"></span>';
+  busy(true);CTRL=new AbortController();let last=0;
+  const paint=()=>{node.innerHTML=md(m.content,true)||'<span class="dots"></span>';scrollEnd()};
+  try{
+    const r=await fetch(CFG.url.replace(/\/+$/,'')+'/chat/completions',{method:'POST',signal:CTRL.signal,headers:{'Content-Type':'application/json','Authorization':'Bearer '+CFG.key},body:JSON.stringify({model:CFG.model,messages:apiMsgs({msgs:c.msgs.slice(0,-1)}),temperature:+CFG.temp,stream:true})});
+    if(!r.ok){let t='';try{t=await r.text()}catch(e){}throw new Error(explain(r.status,t))}
+    const ct=r.headers.get('content-type')||'';
+    if(!r.body||ct.includes('application/json')){const j=await r.json();m.content=(j.choices&&j.choices[0]&&(j.choices[0].message||{}).content)||'';}
+    else{const rd=r.body.getReader(),dec=new TextDecoder();let buf='';
+      for(;;){const {done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let k;
+        while((k=buf.indexOf('\n'))>=0){const line=buf.slice(0,k).trim();buf=buf.slice(k+1);if(!line.startsWith('data:'))continue;const d=line.slice(5).trim();if(d==='[DONE]')continue;
+          let j=null;try{j=JSON.parse(d)}catch(_){continue}if(j.error)throw new Error(j.error.message||'Ошибка сервиса');const delta=j.choices&&j.choices[0]&&(j.choices[0].delta||j.choices[0].message);if(delta&&delta.content)m.content+=delta.content;}
+        if(Date.now()-last>60){last=Date.now();paint()}}}
+    if(!m.content)throw new Error('Модель вернула пустой ответ. Попробуй ещё раз или другую модель.');
+  }catch(e){if(e.name==='AbortError'){if(!m.content)m.content='_(остановлено)_'}else{m.err=e.message==='Failed to fetch'?'Не получилось связаться с сервисом. Проверь интернет/VPN и адрес API в настройках.':e.message;}}
+  CTRL=null;busy(false);harvest(m.content||'');
+  if(c.title==='Новый чат'){const u=c.msgs.find(x=>x.role==='user');if(u)c.title=(u.content||u.files[0]?.name||'Чат').replace(/\s+/g,' ').slice(0,40)}
+  c.ts=Date.now();save();drawMsgs();}
+function harvest(s){const re=/```memory\n([\s\S]*?)```/gi;let k,n=0;while(k=re.exec(s)){for(const line of k[1].split('\n')){const t=line.replace(/^[-•*]\s*/,'').trim();if(t&&t.length<400&&!MEM.some(x=>x.t===t)&&!/(парол|cvv|номер карт|паспорт)/i.test(t)){MEM.push({t,d:today()});n++}}}if(n)toast('🧠 '+(CFG.aname||'Тесса')+' запомнила');}
+const today=()=>new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'short'});
+function explain(s,t){let msg='';try{const j=JSON.parse(t);msg=(j.error&&(j.error.message||j.error))||j.message||''}catch(e){msg=t.slice(0,300)}
+  const hint=s===401?'Ключ не подходит — проверь, что скопировала его целиком.':s===402||/quota|balance|credit/i.test(msg)?'Похоже, на ключе закончились деньги.':s===404?'Неверная модель или адрес API.':s===429?'Слишком много запросов или лимит — подожди минуту.':s>=500?'У сервиса сбой — попробуй чуть позже.':'';
+  return `Ошибка ${s}. ${hint}\n${msg}`.trim();}
+function busy(b){const s=$('send');s.classList.toggle('stop',b);s.textContent=b?'■':'↑';s.title=b?'Остановить':'Отправить'}
+function send(){if(CTRL){CTRL.abort();return}
+  const t=$('inp').value.trim();if(!t&&!ATT.length)return;
+  if(!cur())newChat();const c=cur();
+  if(IMGM){if(!t)return toast('Опиши картинку словами');c.msgs.push({role:'user',content:t,files:[],imgReq:true});ATT=[];drawAtt();$('inp').value='';grow();stick=true;genImg(c,t);return}
+  c.msgs.push({role:'user',content:t,files:ATT});ATT=[];drawAtt();$('inp').value='';grow();stick=true;ask(c);}
+function regen(){const c=cur();if(!c||CTRL)return;const l=c.msgs[c.msgs.length-1];if(l&&l.kind==='img'){c.msgs.pop();if(l.imgId)IDB.del(PK(l.imgId));genImg(c,l.prompt);return}if(l&&l.role==='assistant')c.msgs.pop();ask(c)}
+/* ---------- картинки ---------- */
+let IMGM=false;
+$('imgMode').onclick=()=>{IMGM=!IMGM;$('imgMode').classList.toggle('on',IMGM);$('cbox').classList.toggle('imgm',IMGM);$('inp').placeholder=IMGM?'Опиши картинку — я нарисую…':'Напиши сообщение…';$('inp').focus()};
+const icfg=()=>({...CFG.img,key:CFG.img.same?CFG.key:CFG.img.key});
+async function toData(u){try{const r=await fetch(u);if(!r.ok)throw 0;const b=await r.blob();return await new Promise(ok=>{const f=new FileReader();f.onload=()=>ok(f.result);f.readAsDataURL(b)})}catch(e){return u}}
+function findImg(j){const m=(j.choices&&j.choices[0]&&j.choices[0].message)||{};
+  if(Array.isArray(m.images)&&m.images.length){const x=m.images[0];return (x.image_url&&(x.image_url.url||x.image_url))||x.url||(x.b64_json&&'data:image/png;base64,'+x.b64_json)}
+  if(Array.isArray(m.content)){for(const p of m.content){const u=(p.image_url&&(p.image_url.url||p.image_url))||(p.type==='image'&&(p.url||(p.data&&'data:image/png;base64,'+p.data)));if(u)return u}}
+  const s=typeof m.content==='string'?m.content:'';let k;
+  if(k=s.match(/data:image\/[a-z]+;base64,[A-Za-z0-9+/=]+/))return k[0];
+  if(k=s.match(/!\[[^\]]*\]\((https?:[^)\s]+)\)/))return k[1];
+  if(k=s.match(/https?:\/\/\S+\.(png|jpe?g|webp)(\?\S*)?/i))return k[0];return null}
+async function makeImage(I,prompt,signal){const base=I.url.replace(/\/+$/,'');const H={'Content-Type':'application/json','Authorization':'Bearer '+I.key};
+  const viaImages=async()=>{let r=await fetch(base+'/images/generations',{method:'POST',headers:H,signal,body:JSON.stringify({model:I.model,prompt,n:1,size:I.size})});
+    if(r.status===400)r=await fetch(base+'/images/generations',{method:'POST',headers:H,signal,body:JSON.stringify({model:I.model,prompt})});
+    const t=await r.text();if(!r.ok)throw new Error(explain(r.status,t));let j;try{j=JSON.parse(t)}catch(e){throw new Error('Сервис ответил непонятно')}
+    const d=(j.data||[])[0]||{};if(d.b64_json)return 'data:image/png;base64,'+d.b64_json;if(d.url)return await toData(d.url);throw new Error('Сервис не прислал картинку');};
+  const viaChat=async()=>{const shape=I.size==='1024x1536'?' Вертикальный формат.':I.size==='1536x1024'?' Горизонтальный формат.':'';
+    const r=await fetch(base+'/chat/completions',{method:'POST',headers:H,signal,body:JSON.stringify({model:I.model,messages:[{role:'user',content:'Нарисуй картинку: '+prompt+shape}],modalities:['image','text']})});
+    const t=await r.text();if(!r.ok)throw new Error(explain(r.status,t));let j;try{j=JSON.parse(t)}catch(e){throw new Error('Сервис ответил непонятно')}
+    const u=findImg(j);if(!u)throw new Error('Модель ответила без картинки — похоже, она не умеет рисовать. Выбери в настройках модель для картинок.');return u.startsWith('data:')?u:await toData(u);};
+  if(I.meth==='images')return viaImages();if(I.meth==='chat')return viaChat();
+  try{return await viaImages()}catch(e){if(e.name==='AbortError')throw e;try{return await viaChat()}catch(e2){if(e2.name==='AbortError')throw e2;throw new Error(e.message+'\n\nЧерез чат тоже не получилось: '+e2.message)}}}
+async function genImg(c,prompt){const I=icfg();
+  if(!I.key||!I.model){openSet('img');toast('Укажи ключ и модель для картинок');return}
+  const m={role:'assistant',kind:'img',prompt,imgId:null};c.msgs.push(m);drawMsgs();busy(true);CTRL=new AbortController();
+  try{const u=await makeImage(I,prompt,CTRL.signal);const id='img_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);if(!await IDB.set(PK(id),u))throw new Error('Не получилось сохранить картинку в браузере');m.imgId=id;}
+  catch(e){m.err=e.name==='AbortError'?'Остановлено':e.message==='Failed to fetch'?'Не получилось связаться с сервисом картинок. Проверь интернет/VPN и адрес API.':e.message}
+  CTRL=null;busy(false);if(c.title==='Новый чат')c.title=('🎨 '+prompt).replace(/\s+/g,' ').slice(0,40);c.ts=Date.now();save();drawMsgs();}
+$('send').onclick=send;
+const touch=matchMedia('(pointer:coarse)').matches;if(touch)$('hint').textContent='Чтобы отправить — нажми ↑';
+$('inp').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!touch&&!e.isComposing){e.preventDefault();send()}});
+function grow(){const t=$('inp');t.style.height='auto';t.style.height=Math.min(t.scrollHeight,220)+'px'}
+$('inp').addEventListener('input',grow);
+
+/* ---------- настройки ---------- */
+function tab(t){document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));['chat','img','look','prof'].forEach(x=>$('tp-'+x).hidden=x!==t)}
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(b)tab(b.dataset.t)};
+function openSet(t){tab(typeof t==='string'?t:'chat');const I=CFG.img;$('iprov').value=IMODELS[I.url]?I.url:'custom';$('iurl').value=I.url;$('iurlF').hidden=!!IMODELS[I.url];$('isame').checked=!!I.same;$('ikey').value=I.key;$('ikeyF').hidden=!!I.same;$('imodel').value=I.model;$('isize').value=I.size;$('imeth').value=I.meth;fillI();$('itst').textContent='';$('dim').value=CFG.dim;$('dimV').textContent=Math.round(CFG.dim*100)+'%';drawSw();$('prov').value=MODELS[CFG.url]?CFG.url:'custom';$('url').value=CFG.url;$('urlF').hidden=!!MODELS[CFG.url];$('key').value=CFG.key;$('model').value=CFG.model;$('temp').value=CFG.temp;$('tv').textContent=CFG.temp;$('uname').value=CFG.uname;$('aname').value=CFG.aname||'';$('persona').value=CFG.persona;$('pName').textContent=P.name;$('pOld').value='';$('pNew').value='';fillModels();$('tst').textContent='';$('setM').hidden=false;}
+function fillModels(){const u=$('prov').value==='custom'?$('url').value:$('prov').value;$('mlist').innerHTML=(MODELS[u]||[]).map(x=>`<option value="${x}">`).join('')}
+$('prov').onchange=()=>{const v=$('prov').value;$('urlF').hidden=v!=='custom';if(v!=='custom')$('url').value=v;fillModels()};
+$('temp').oninput=()=>$('tv').textContent=$('temp').value;
+function fillI(){const u=$('iprov').value==='custom'?$('iurl').value:$('iprov').value;$('ilist').innerHTML=(IMODELS[u]||[]).map(x=>`<option value="${x}">`).join('')}
+$('iprov').onchange=()=>{const v=$('iprov').value;$('iurlF').hidden=v!=='custom';if(v!=='custom')$('iurl').value=v;fillI()};
+$('isame').onchange=()=>$('ikeyF').hidden=$('isame').checked;
+const readImg=()=>({url:($('iprov').value==='custom'?$('iurl').value:$('iprov').value).trim(),same:$('isame').checked,key:$('ikey').value.trim(),model:$('imodel').value.trim(),size:$('isize').value,meth:$('imeth').value});
+$('itest').onclick=async()=>{const I=readImg();if(I.same)I.key=$('key').value.trim();$('itst').textContent='Рисую… (до минуты)';$('itst').style.color='var(--muted)';
+  try{const u=await makeImage(I,'милый рыжий котик, мультяшный стиль');$('itst').innerHTML=`<span style="color:var(--ok)">✓ Работает!</span> <img src="${u}" style="height:48px;vertical-align:middle;border-radius:8px">`}catch(e){$('itst').textContent='✕ '+(e.message==='Failed to fetch'?'Нет связи с сервисом (интернет/VPN/адрес)':e.message);$('itst').style.color='var(--bad)'}};
+/* оформление — применяется сразу */
+function drawSw(){$('sw').innerHTML=ACCS.map(c=>`<button style="background:${c}" data-c="${c}" class="${c===CFG.acc?'on':''}" title="${c}"></button>`).join('')+`<input type="color" id="accC" value="${CFG.acc}" title="Свой цвет">`;$('accC').oninput=e=>setAcc(e.target.value)}
+function setAcc(c){CFG.acc=c;save();applyLook();drawSw()}
+$('sw').onclick=e=>{const b=e.target.closest('[data-c]');if(b)setAcc(b.dataset.c)};
+$('dim').oninput=()=>{CFG.dim=+$('dim').value;$('dimV').textContent=Math.round(CFG.dim*100)+'%';save();applyLook()};
+$('bgBtn').onclick=()=>$('bgIn').click();$('avBtn').onclick=()=>$('avIn').click();
+$('bgIn').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;if(f.size>15e6)return toast('Картинка больше 15 МБ');await IDB.set(PK('bg'),await shrink(f,2200));applyLook();toast('Фон установлен')};
+$('avIn').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;await IDB.set(PK('ava'),await square(f));await applyLook();drawMsgs();drawProfiles();toast('Аватарка установлена')};
+$('bgDel').onclick=async()=>{await IDB.del(PK('bg'));setTimeout(applyLook,50)};$('avDel').onclick=async()=>{await IDB.del(PK('ava'));setTimeout(()=>applyLook().then(drawMsgs),50)};
+function square(f){return new Promise(ok=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(im.width,im.height),c=document.createElement('canvas');c.width=c.height=256;c.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,256,256);ok(c.toDataURL('image/jpeg',.9))};im.src=r.result};r.readAsDataURL(f)})}
+function readSet(){return{url:($('prov').value==='custom'?$('url').value:$('prov').value).trim(),key:$('key').value.trim(),model:$('model').value.trim(),temp:+$('temp').value,uname:$('uname').value.trim(),aname:$('aname').value.trim()||'Тесса',persona:$('persona').value.trim()||PERSONA,img:readImg()}}
+$('setS').onclick=()=>{Object.assign(CFG,readSet());save();$('setM').hidden=true;toast('Сохранено');applyName();drawMsgs()};
+$('setX').onclick=()=>$('setM').hidden=true;
+$('setM').onclick=e=>{if(e.target.id==='setM')$('setM').hidden=true};
+$('resetP').onclick=()=>{$('persona').value=PERSONA};
+$('test').onclick=async()=>{const s=readSet();$('tst').textContent='Проверяю…';$('tst').style.color='var(--muted)';
+  try{const r=await fetch(s.url.replace(/\/+$/,'')+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+s.key},body:JSON.stringify({model:s.model,messages:[{role:'user',content:'Ответь одним словом: мяу'}],max_tokens:10})});
+    const t=await r.text();if(!r.ok)throw new Error(explain(r.status,t));$('tst').textContent='✓ Работает!';$('tst').style.color='var(--ok)';}
+  catch(e){$('tst').textContent='✕ '+(e.message==='Failed to fetch'?'Нет связи с сервисом (интернет/VPN/адрес)':e.message);$('tst').style.color='var(--bad)'}};
+$('openSet').onclick=()=>openSet();$('gear').onclick=()=>openSet();
+
+/* ---------- мобильное меню ---------- */
+$('menu').onclick=()=>$('side').classList.toggle('open');
+function closeSide(){$('side').classList.remove('open')}
+$('msgs').addEventListener('click',closeSide);
+
+
+
+
+/* ================= память ================= */
+let MEM=[];
+const MEM_RULES=`
+
+ПАМЯТЬ. У тебя есть долгая память о собеседнике (она выше). Если собеседник просит что-то запомнить или рассказывает важный и долгий факт о себе (любимое, планы, проекты, близкие люди, как с ним лучше общаться) — в САМОМ КОНЦЕ ответа добавь блок:
+\`\`\`memory
+коротко, одной строкой, от третьего лица
+\`\`\`
+Не запоминай мелочи на один раз, пароли, номера карт и документов. Не повторяй то, что уже есть в памяти.`;
+
+/* ================= знания Tavo ================= */
+const TAVO=`ЗНАНИЯ: TAVO (приложение для ролевых чатов с ИИ, похоже на SillyTavern). Ты хорошо умеешь делать для него пресеты, лорбуки, регексы и плашки (виджеты). Если не уверена в точном названии поля или формате конкретной версии Tavo — честно скажи и попроси пример файла: подстраивайся под присланный пример, он важнее этих заметок.
+
+ПРЕСЕТ — набор промптов, которые управляют тем, как модель пишет.
+- Состоит из блоков-промптов (системные правила, стиль, формат ответа, запреты), которые можно включать/выключать тумблерами.
+- Хороший пресет: ясные правила стиля (живые персонажи со своим характером, мир, который живёт сам по себе, химия и напряжение, диалоги и действия, без повторов и клише), длина ответа (например, 3–5 абзацев), правила формата (где и как выводить теги для плашек).
+- Держи суммарный объём разумным (ориентир — до ~15k токенов), пиши инструкции чётко, без воды, лучше на английском — модели слушаются точнее.
+- Отдавай целиком готовым JSON для импорта, а не кусками.
+
+ЛОРБУК (World Info) — записи о мире, которые подмешиваются в контекст, когда в чате встречаются ключевые слова.
+- Запись: ключи-триггеры (можно на русском, если чат на русском), содержание (часто на английском — компактнее и точнее), порядок/приоритет, позиция вставки, опция «всегда активна» для базовых фактов.
+- Одна запись — одна тема (персонаж, место, фракция, правило мира). Пиши фактами и поведением, а не пересказом. Добавляй, как персонаж говорит и действует.
+- Ключи делай с вариантами склонений и синонимами.
+
+РЕГЕКС-СКРИПТ — правило «найди и замени» для текста ответа.
+- Основа: findRegex (регулярное выражение, например /<loc>([\\s\\S]*?)<\\/loc>/g) и replaceString (на что заменить; $1, $2 — найденные группы), плюс где применять (к ответу модели / к вводу), только для отображения или и для промпта.
+- Так прячут служебные теги, чистят мусор, превращают теги в красивую разметку.
+
+ПЛАШКА (виджет) — регекс, у которого replaceString — это HTML+CSS+JS карточка.
+- Схема: в пресете просим модель выводить данные в теге (например <location>Место|Время|Погода</location>), регекс ловит тег и подставляет значения в карточку через $1, $2…
+- Типичные плашки: локация, мысли персонажа (в т.ч. скрытые «глубокие»), музыка, SMS-переписка, магазин с корзиной, кошелёк, такси, Instagram/Twitter.
+- Внутри Tavo есть API для скриптов плашек: сохранение состояния между сообщениями (tavo.get / tavo.set), генерация текста моделью (tavo.generate) и картинок (tavo.image.generate). Используй их, а если не уверена в сигнатуре — спроси пример.
+- Правила качества: красиво и читабельно (мягкие шрифты, контраст, ничего не налезает), аккуратный размер (не огромная, не всё в одну), разворачивается обычным плавным раскрытием, кликабельные элементы. Для телефонов: без backdrop-filter и бесконечных анимаций (греют телефон), без звуков уведомлений. Без внешних библиотек, всё в одном куске.
+- Мысли персонажа — только в плашке мыслей, не в прозе.
+- Отдавай готовый JSON регекса (или zip со всей группой), чтобы импортировать сразу, без ручного копирования.`;
+
+/* ================= шифрование ================= */
+const te=new TextEncoder(),td=new TextDecoder();
+const b64e=u=>{let s='';const a=new Uint8Array(u);for(let i=0;i<a.length;i+=0x8000)s+=String.fromCharCode.apply(null,a.subarray(i,i+0x8000));return btoa(s)};
+const b64d=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function derive(pw,salt){const base=await crypto.subtle.importKey('raw',te.encode(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt:b64d(salt),iterations:250000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+async function enc(obj,k=KEY){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},k,te.encode(JSON.stringify(obj)));return{iv:b64e(iv),ct}}
+async function dec(rec,k=KEY){const ct=typeof rec.ct==='string'?b64d(rec.ct):rec.ct;const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64d(rec.iv)},k,ct);return JSON.parse(td.decode(pt))}
+
+/* ================= профили ================= */
+let PROFS=LS.get('mfa_profiles',[]);
+const saveProfs=()=>LS.set('mfa_profiles',PROFS);
+async function drawProfiles(){const L=[];for(const p of PROFS){const a=await IDB.get('p:'+p.id+':ava');L.push(`<button class="pbtn" data-p="${p.id}"><span class="pa" style="${a?`background-image:url('${a}')`:''}">${a?'':'🐱'}</span><span>${esc(p.name)}</span></button>`)}
+  $('plist').innerHTML=L.join('')||'<p>Профилей пока нет — создай свой.</p>';}
+function lockView(v,p){$('lPick').hidden=v!=='pick';$('lIn').hidden=v!=='in';$('lNew').hidden=v!=='new';$('lLinks').hidden=v==='in';$('lAdd').hidden=v!=='pick';
+  if(v==='in'){$('lInT').textContent='Привет, '+p.name+'! Введи пароль';$('lPw').value='';$('lErr').textContent='';setTimeout(()=>$('lPw').focus(),50)}
+  if(v==='new'){['nName','nPw','nPw2'].forEach(x=>$(x).value='');$('nErr').textContent='';setTimeout(()=>$('nName').focus(),50)}}
+let PICK=null;
+$('plist').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;PICK=PROFS.find(p=>p.id===b.dataset.p);lockView('in',PICK)};
+$('lBack').onclick=()=>lockView('pick');$('nBack').onclick=()=>lockView(PROFS.length?'pick':'new');$('lAdd').onclick=()=>lockView('new');
+$('lIn').onsubmit=async e=>{e.preventDefault();const pw=$('lPw').value;if(!pw)return;$('lErr').textContent='Проверяю…';
+  try{const k=await derive(pw,PICK.salt);const rec=await IDB.get('v:'+PICK.id);if(!rec)throw new Error('nodata');const v=await dec(rec,k);await enter(PICK,k,v)}
+  catch(x){$('lErr').textContent=x.message==='nodata'?'Данные профиля не найдены на этом устройстве':'Неверный пароль'}};
+$('lForgot').onclick=async()=>{const n=prompt('Пароль восстановить нельзя — можно только удалить профиль «'+PICK.name+'» со всеми чатами.\n\nЧтобы удалить, напиши его имя:');if(n!==PICK.name)return;await wipe(PICK);lockView(PROFS.length?'pick':'new');drawProfiles();toast('Профиль удалён')};
+$('lNew').onsubmit=async e=>{e.preventDefault();const name=$('nName').value.trim(),pw=$('nPw').value,pw2=$('nPw2').value;
+  if(!name)return $('nErr').textContent='Напиши имя';if(PROFS.some(p=>p.name.toLowerCase()===name.toLowerCase()))return $('nErr').textContent='Такой профиль уже есть';
+  if(pw.length<4)return $('nErr').textContent='Пароль хотя бы из 4 символов';if(pw!==pw2)return $('nErr').textContent='Пароли не совпадают';
+  $('nErr').textContent='Создаю…';const p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,salt:b64e(crypto.getRandomValues(new Uint8Array(16)))};
+  const k=await derive(pw,p.salt);const v={cfg:Object.assign({},DEF,{img:{...DEFIMG},uname:name,tavo:$('nTavo').checked}),chats:[],cur:null,mem:[]};
+  await IDB.set('v:'+p.id,await enc(v,k));PROFS.push(p);saveProfs();await enter(p,k,v);setTimeout(()=>openSet(),400)};
+async function enter(p,k,v){P=p;KEY=k;V=v;CFG=Object.assign({},DEF,v.cfg||{});CFG.img=Object.assign({},DEFIMG,CFG.img||{});CH=v.chats||[];CUR=v.cur;MEM=v.mem||[];
+  if(!CH.find(c=>c.id===CUR))CUR=CH[0]?CH[0].id:null;
+  $('lock').hidden=true;$('meName').textContent=p.name;applyName();await applyLook();drawList();drawMsgs();musInit();}
+function applyName(){const n=CFG.aname||'Тесса';$('brandT').textContent='Мяфля · '+n;document.querySelectorAll('.aN').forEach(x=>x.textContent=n.endsWith('а')?n.slice(0,-1)+'ы':n);}
+async function lockApp(){if(CTRL)CTRL.abort();clearTimeout(saveT);await saveNow();musStop();P=null;KEY=null;V=null;CH=[];CUR=null;MEM=[];CFG=Object.assign({},DEF,{img:{...DEFIMG}});
+  $('inner').innerHTML='';$('clist').innerHTML='';['setM','memM','musM'].forEach(x=>$(x).hidden=true);await applyLook();await drawProfiles();lockView(PROFS.length?'pick':'new');$('lock').hidden=false;}
+$('lockB').onclick=lockApp;
+async function wipe(p){try{const d=await IDB.open();await new Promise(ok=>{const t=d.transaction('kv','readwrite'),s=t.objectStore('kv');const r=s.openCursor();r.onsuccess=()=>{const c=r.result;if(!c)return;const k=String(c.key);if(k==='v:'+p.id||k.startsWith('p:'+p.id+':'))c.delete();c.continue()};t.oncomplete=ok;t.onerror=ok})}catch(e){}
+  PROFS=PROFS.filter(x=>x.id!==p.id);saveProfs();}
+/* импорт/экспорт профиля */
+function dlFile(name,text){const b=new Blob([text],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),3000)}
+$('pExp').onclick=async()=>{await saveNow();const rec=await IDB.get('v:'+P.id);dlFile('мяфля_профиль_'+P.name+'_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({type:'myaflya-profile',v:1,name:P.name,salt:P.salt,vault:{iv:rec.iv,ct:b64e(rec.ct)}}));toast('Файл зашифрован твоим паролем')};
+$('lImp').onclick=()=>$('lImpF').click();
+$('lImpF').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const j=JSON.parse(await f.text());if(j.type!=='myaflya-profile')throw 0;
+  let name=j.name;if(PROFS.some(p=>p.name===name))name+=' (копия)';const p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,salt:j.salt};
+  await IDB.set('v:'+p.id,{iv:j.vault.iv,ct:b64d(j.vault.ct)});PROFS.push(p);saveProfs();await drawProfiles();lockView('pick');toast('Профиль «'+name+'» загружен — войди своим паролем')}catch(x){toast('Это не файл профиля')}};
+$('pChats').onclick=()=>$('pChatsF').click();
+$('pChatsF').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const arr=JSON.parse(await f.text());if(!Array.isArray(arr))throw 0;const ids=new Set(CH.map(c=>c.id));let n=0;arr.forEach(c=>{if(c&&c.id&&Array.isArray(c.msgs)&&!ids.has(c.id)){c.msgs=c.msgs.filter(m=>m.kind!=='img');CH.push(c);n++}});CH.sort((a,b)=>(b.ts||0)-(a.ts||0));save();drawList();toast('Добавлено чатов: '+n)}catch(x){toast('Это не файл с чатами')}};
+$('pChg').onclick=async()=>{const o=$('pOld').value,n=$('pNew').value;if(n.length<4)return toast('Новый пароль хотя бы из 4 символов');
+  try{const ko=await derive(o,P.salt);await dec(await IDB.get('v:'+P.id),ko)}catch(x){return toast('Старый пароль неверный')}
+  await saveNow();const salt=b64e(crypto.getRandomValues(new Uint8Array(16)));KEY=await derive(n,salt);P.salt=salt;const pr=PROFS.find(x=>x.id===P.id);pr.salt=salt;saveProfs();await saveNow();$('pOld').value='';$('pNew').value='';toast('Пароль изменён')};
+$('pDel').onclick=async()=>{const n=prompt('Удалить профиль «'+P.name+'» со всеми чатами, памятью и музыкой? Это нельзя отменить.\n\nНапиши имя профиля, чтобы подтвердить:');if(n!==P.name)return;const p=P;clearTimeout(saveT);P=null;KEY=null;await wipe(p);P=null;await lockApp();toast('Профиль удалён')};
+
+/* ================= окно памяти ================= */
+function memDraw(){$('memL').innerHTML=MEM.length?MEM.map((m,i)=>`<div class="memE"><span>${esc(m.t)}<small>${esc(m.d||'')}</small></span><button data-me="${i}" title="Изменить">✎</button><button data-md="${i}" title="Забыть">✕</button></div>`).join(''):'<div class="note">Пока пусто. Напиши что-нибудь о себе или скажи в чате «запомни, что…».</div>';}
+$('openMem').onclick=()=>{$('about').value=CFG.about||'';$('kTavo').checked=!!CFG.tavo;memDraw();$('memM').hidden=false;closeSide()};
+$('memAdd').onclick=()=>{const t=$('memIn').value.trim();if(!t)return;MEM.push({t,d:today()});$('memIn').value='';memDraw();save()};
+$('memIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('memAdd').click()}});
+$('memL').onclick=e=>{const d=e.target.closest('[data-md]'),ed=e.target.closest('[data-me]');
+  if(d){const i=+d.dataset.md;if(confirm('Забыть: «'+MEM[i].t+'»?')){MEM.splice(i,1);memDraw();save()}}
+  if(ed){const i=+ed.dataset.me;const t=prompt('Изменить воспоминание:',MEM[i].t);if(t&&t.trim()){MEM[i].t=t.trim();memDraw();save()}}};
+$('memX').onclick=()=>{CFG.about=$('about').value.trim();CFG.tavo=$('kTavo').checked;save();$('memM').hidden=true};
+$('memM').onclick=e=>{if(e.target.id==='memM')$('memX').click()};
+$('memExp').onclick=()=>dlFile('память_'+(CFG.aname||'Тесса')+'_'+P.name+'.json',JSON.stringify({type:'myaflya-memory',v:1,about:CFG.about,mem:MEM},null,1));
+$('memImp').onclick=()=>$('memImpF').click();
+$('memImpF').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const j=JSON.parse(await f.text());if(j.type!=='myaflya-memory')throw 0;let n=0;
+  (j.mem||[]).forEach(m=>{const t=(typeof m==='string'?m:m.t||'').trim();if(t&&!MEM.some(x=>x.t===t)){MEM.push({t,d:m.d||today()});n++}});
+  if(j.about&&!($('about').value||'').includes(j.about.slice(0,40)))$('about').value=(($('about').value||'')+'\n'+j.about).trim();
+  if(j.persona_add&&!CFG.persona.includes(j.persona_add.slice(0,40)))CFG.persona=CFG.persona+'\n\n'+j.persona_add;
+  if(j.aname)CFG.aname=j.aname;
+  memDraw();CFG.about=$('about').value.trim();save();applyName();toast('Добавлено воспоминаний: '+n)}catch(x){toast('Это не файл памяти')}};
+
+/* ================= музыка ================= */
+const pl=(n,a,b,c)=>{n=Math.abs(n)%100;const m=n%10;return n>10&&n<20?c:m===1?a:m>=2&&m<=4?b:c};
+const AUD=$('aud');let MI=-1;
+function musInit(){AUD.volume=CFG.vol??.8;$('mVol').value=AUD.volume;$('mShuf').checked=!!CFG.shuf;musNow()}
+function musNow(){const t=CFG.music[MI];$('mNow').textContent=t?t.name:(CFG.music.length?'музыка: '+CFG.music.length+' '+pl(CFG.music.length,'песня','песни','песен'):'музыка: добавь песни');$('mplay').classList.toggle('on',!AUD.paused);$('mPP').textContent=AUD.paused?'▶':'⏸';musList()}
+function musList(){$('tlist').innerHTML=CFG.music.length?CFG.music.map((t,i)=>`<div class="tr2${i===MI?' cur':''}"><button data-mp="${i}">${i===MI&&!AUD.paused?'⏸':'▶'}</button><span>${esc(t.name)}</span><button data-mx="${i}" title="Удалить">✕</button></div>`).join(''):'<div class="note">Плейлист пуст.</div>'}
+let curURL=null;
+async function musPlay(i){const t=CFG.music[i];if(!t)return;const b=await IDB.get(PK('m:'+t.id));if(!b){toast('Файл песни не найден');return}if(curURL)URL.revokeObjectURL(curURL);curURL=URL.createObjectURL(b);AUD.src=curURL;MI=i;try{await AUD.play()}catch(e){}musNow()}
+function musNext(){const n=CFG.music.length;if(!n)return;musPlay(CFG.shuf&&n>1?(MI+1+Math.floor(Math.random()*(n-1)))%n:(MI+1)%n)}
+function musStop(){AUD.pause();AUD.removeAttribute('src');if(curURL){URL.revokeObjectURL(curURL);curURL=null}MI=-1}
+$('mPP').onclick=()=>{if(!CFG.music.length)return $('mOpen').click();if(MI<0)return musPlay(0);AUD.paused?AUD.play():AUD.pause()};
+$('mNx').onclick=musNext;AUD.onended=musNext;AUD.onplay=AUD.onpause=musNow;
+$('mOpen').onclick=()=>{musList();$('musM').hidden=false};$('musX').onclick=()=>$('musM').hidden=true;$('musM').onclick=e=>{if(e.target.id==='musM')$('musM').hidden=true};
+$('mAdd').onclick=()=>$('mAddF').click();
+$('mAddF').onchange=async e=>{const fs=[...e.target.files];e.target.value='';let n=0;for(const f of fs){if(!f.type.startsWith('audio/')&&!/\.(mp3|m4a|ogg|wav|flac|aac|opus)$/i.test(f.name))continue;const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  if(await IDB.set(PK('m:'+id),f)){CFG.music.push({id,name:f.name.replace(/\.[^.]+$/,'').replace(/[_]+/g,' ').replace(/\s*\((official|lyrics?)[^)]*\)/ig,'').trim()});n++}}save();musNow();toast('Добавлено песен: '+n)};
+$('tlist').onclick=e=>{const p=e.target.closest('[data-mp]'),x=e.target.closest('[data-mx]');
+  if(p){const i=+p.dataset.mp;if(i===MI){AUD.paused?AUD.play():AUD.pause()}else musPlay(i)}
+  if(x){const i=+x.dataset.mx;const t=CFG.music[i];if(!confirm('Удалить «'+t.name+'»?'))return;IDB.del(PK('m:'+t.id));if(i===MI)musStop();else if(i<MI)MI--;CFG.music.splice(i,1);save();musNow()}};
+$('mVol').oninput=()=>{AUD.volume=+$('mVol').value;CFG.vol=AUD.volume;save()};
+$('mShuf').onchange=()=>{CFG.shuf=$('mShuf').checked;save()};
+
+/* ================= запуск ================= */
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&P)saveNow()});
+addEventListener('pagehide',()=>{if(P)saveNow()});
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+(async()=>{await applyLook();await drawProfiles();lockView(PROFS.length?'pick':'new');})();
+
+</script></body></html>
